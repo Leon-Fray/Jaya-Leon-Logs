@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #0D1418; }
+        .messages { max-width: 600px; margin: 20px auto; }
+        .message { 
+            max-width: 65%;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 7.5px;
+            color: white;
+            background: #202C33;
+        }
+        .leon { margin-left: auto; }
+        .jaya { margin-right: auto; }
+        .name-leon { color: #3b82f6; }
+        .name-jaya { color: #ec4899; }
+    </style>
+</head>
+<body>
+    <div class="messages" id="messages"></div>
+    <script>
+        fetch('_chat.txt')
+            .then(response => response.text())
+            .then(text => {
+                const messages = text.match(/\[(.*?)\] (.*?): (.*)/g).map(msg => {
+                    const [_, time, sender, content] = msg.match(/\[(.*?)\] (.*?): (.*)/);
+                    return { sender, content: content.trim() };
+                });
+
+                const html = messages.map(msg => `
+                    <div class="message ${msg.sender === 'Leon' ? 'leon' : 'jaya'}">
+                        <div class="name-${msg.sender === 'Leon' ? 'leon' : 'jaya'}">${msg.sender}</div>
+                        <div>${msg.content}</div>
+                    </div>
+                `).join('');
+
+                document.getElementById('messages').innerHTML = html;
+            });
+    </script>
+</body>
+</html>
