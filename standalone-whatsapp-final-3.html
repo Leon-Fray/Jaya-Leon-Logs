@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        .chat-container { background: #0D1418; min-height: 100vh; padding: 20px; }
+        .messages-container { max-width: 600px; margin: 0 auto; }
+        .message { 
+            max-width: 65%;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 7.5px;
+            color: white;
+            word-wrap: break-word;
+            background: #202C33;
+        }
+        .message.leon {
+            margin-left: auto;
+        }
+        .message.jaya {
+            margin-right: auto;
+        }
+        .name.jaya { color: #ec4899; font-size: 13px; margin-bottom: 4px; }
+        .name.leon { color: #3b82f6; font-size: 13px; margin-bottom: 4px; }
+        .file-input {
+            background: #202C33;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        function WhatsAppChat() {
+            const [messages, setMessages] = React.useState([]);
+
+            const parseWhatsAppText = (text) => {
+                const messagePattern = /\[(.*?)\] (.*?): (.*)/g;
+                const matches = Array.from(text.matchAll(messagePattern));
+                return matches.map(match => ({
+                    timestamp: match[1],
+                    sender: match[2],
+                    content: match[3].trim()
+                }));
+            };
+
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const text = e.target.result;
+                        const parsedMessages = parseWhatsAppText(text);
+                        setMessages(parsedMessages);
+                    };
+                    reader.readAsText(file);
+                }
+            };
+
+            return (
+                <div className="chat-container">
+                    <div className="messages-container">
+                        <input
+                            type="file"
+                            onChange={handleFileUpload}
+                            className="file-input"
+                            accept=".txt"
+                        />
+                        {messages.map((msg, index) => (
+                            <div key={index} className={`message ${msg.sender === 'Leon' ? 'leon' : 'jaya'}`}>
+                                <div className={`name ${msg.sender === 'Leon' ? 'leon' : 'jaya'}`}>
+                                    {msg.sender}
+                                </div>
+                                <div>{msg.content}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<WhatsAppChat />, document.getElementById('root'));
+    </script>
+</body>
+</html>
